@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo 'Usage: pgd <database>'
+    echo '       e.g. pgd lccmdev'
+    exit 1
+fi
+
+DATABASE=$1
+BU_FILENAME=$DATABASE-`date +%Y-%m-%d_%H%M`.backup
+
+pg_dump -h localhost -U postgres -vFc -f $BU_FILENAME $DATABASE

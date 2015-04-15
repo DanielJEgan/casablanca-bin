@@ -1,0 +1,44 @@
+#!/bin/bash
+
+USAGE="pgd <databaseName>"
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+DBNAME=$1
+HOST=`hostname|sed 's/\.jirvan\.com$//'|sed 's/\.collectionsmanager.com.au$//'`
+DAYSTAMP=`date +%Y-%m-%d`
+TIMESTAMP=`date +%Y%m%d-%H%M`
+
+# Set and check MAIN_BACKUP_DIR
+MAIN_BACKUP_DIR=$HOME/backups
+if ! test -e $MAIN_BACKUP_DIR
+then
+    echo $MAIN_BACKUP_DIR  does NOT exist
+    exit 1
+fi
+
+# Set and create DB_BACKUP_DIR if necessary
+#DB_BACKUP_DIR=$MAIN_BACKUP_DIR/$DBNAME
+#if ! test -e $DB_BACKUP_DIR
+#then
+    #mkdir "$DB_BACKUP_DIR"
+#fi
+
+
+BACKUP_FILENAME=$HOST-$DBNAME-$TIMESTAMP.backup
+BACKUP_FILEPATH=$MAIN_BACKUP_DIR/$BACKUP_FILENAME
+
+cd "$MAIN_BACKUP_DIR"
+if [ "$OSTYPE" = "cygwin" ]
+then
+    pg_dump -U postgres -vFc -f $BACKUP_FILENAME $DBNAME 2> >(tee $BACKUP_FILEPATH.log >&2)
+else
+    pg_dump -h localhost -U postgres -vFc -f $BACKUP_FILENAME $DBNAME 2> >(tee $BACKUP_FILEPATH.log >&2)
+    #sudo -u postgres pg_dump -vFc -f $BACKUP_FILENAME $DBNAME 2> >(tee $BACKUP_FILEPATH.log >&2)
+fi

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]
+then
+    echo
+    echo 'Usage: pgr <database> <file>'
+    echo '       e.g. pgd lccmdev lccmprd-2015-03-01_1915.backup'
+    exit 1
+fi
+
+DATABASE=$1
+BU_FILE=$2
+
+pg_restore -h localhost -U $DATABASE -n public --no-owner -d $DATABASE $BU_FILE

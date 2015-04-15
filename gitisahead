@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ "$1" = "" ]
+then
+    ROOT_DIR="."
+else
+    ROOT_DIR="$1"
+fi
+
+if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep '# Your branch is ahead'|wc -l` -gt 0 ]
+then
+    exit 0
+else
+    exit 1
+fi
