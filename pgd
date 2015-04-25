@@ -16,23 +16,17 @@ DAYSTAMP=`date +%Y-%m-%d`
 TIMESTAMP=`date +%Y%m%d-%H%M`
 
 # Set and check MAIN_BACKUP_DIR
-MAIN_BACKUP_DIR=$HOME/backups
-if ! test -e $MAIN_BACKUP_DIR
-then
-    echo $MAIN_BACKUP_DIR  does NOT exist
-    exit 1
-fi
-
-# Set and create DB_BACKUP_DIR if necessary
-#DB_BACKUP_DIR=$MAIN_BACKUP_DIR/$DBNAME
-#if ! test -e $DB_BACKUP_DIR
+#MAIN_BACKUP_DIR=$HOME/backups
+#if ! test -e $MAIN_BACKUP_DIR
 #then
-    #mkdir "$DB_BACKUP_DIR"
+    #echo $MAIN_BACKUP_DIR  does NOT exist
+    #exit 1
 #fi
 
 
 BACKUP_FILENAME=$HOST-$DBNAME-$TIMESTAMP.backup
-BACKUP_FILEPATH=$MAIN_BACKUP_DIR/$BACKUP_FILENAME
+#BACKUP_FILEPATH=$MAIN_BACKUP_DIR/$BACKUP_FILENAME
+BACKUP_FILEPATH=$BACKUP_FILENAME
 
 cd "$MAIN_BACKUP_DIR"
 if [ "$OSTYPE" = "cygwin" ]

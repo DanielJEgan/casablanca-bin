@@ -69,7 +69,7 @@ then
 fi
 
 # Build the release
-if ! mvn clean source:jar install -Denforcer.skip=true -Dmaven.test.skip=true
+if ! mvn clean install -Prelease
 then
     exit 1
 fi

@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Check there are no uncommitted changes
+if gitismod .
+then
+    echo
+    echo ERROR: There are uncommitted changes
+    echo
+    exit 1
+fi
+
+# Check there are no "un-pushed" commits
+if gitisahead .
+then
+    echo
+    echo ERROR: There are \"un-pushed\" commits to \'origin/master\'
+    echo
+    exit 1
+fi
+
+# Check valid current version in pom file
+if ! mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$' >/dev/null
+then
+    echo
+    echo ERROR: Project does not seem to have a -SNAPSHOT version
+    echo
+    exit 1
+fi
+
+# Extract release version etc and confirm before proceeding
+ORIG_BRANCH=`git branch| grep '^\* '|sed 's/\* //'`
+RELEASE_VERSION=`mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$'|sed 's/\[INFO\] Building .* //'|sed 's/-SNAPSHOT$//'`
+RELEASE_TAG=v$RELEASE_VERSION
+if [ "$ORIG_BRANCH" = "dev" ]
+then
+    EFFECTIVE_BUILD_NUMBER="_"`date +%Y-%m-%d_%H%M`
+else
+    EFFECTIVE_BUILD_NUMBER=-$ORIG_BRANCH"_"`date +%Y-%m-%d_%H%M`
+fi
+BUILD_TAG=$RELEASE_TAG-build$EFFECTIVE_BUILD_NUMBER
+while true; do
+    echo
+    read -p "   Do you wish to build $BUILD_TAG (y/n) ?" yn
+    case $yn in
+        [Yy] ) break;;
+        [Nn] ) exit;;
+        * ) echo "   Please answer y or n.";;
+    esac
+done
+echo
+
+# Create temp branch
+if ! git checkout -b $BUILD_TAG'_tmpBranch'
+then
+    exit 1
+fi
+
+# Update POMs with build number
+if ! mvn jgitflow:build-number -DbuildNumber=$EFFECTIVE_BUILD_NUMBER
+then
+    exit 1
+fi
+
+# Stage POM changes for commit
+if ! git add -A
+then
+    exit 1
+fi
+
+# Commit POM version changes
+if ! git commit -m "gitflow:updating poms for "$RELEASE_VERSION"-build"$EFFECTIVE_BUILD_NUMBER
+then
+    exit 1
+fi
+
+# Tag current commit
+if ! git tag $BUILD_TAG
+then
+    exit 1
+fi
+
+# Push tag to origin
+if ! git push origin $BUILD_TAG
+then
+    exit 1
+fi
+
+# Check out some other branch
+if ! git checkout $ORIG_BRANCH
+then
+    exit 1
+fi
+
+# Delete the temp branch
+if ! git branch -D $BUILD_TAG'_tmpBranch'
+then
+    exit 1
+fi
+
+
+# Checkout the tag
+if ! git checkout $BUILD_TAG
+then
+    exit 1
+fi
+
+# Build the release
+if ! mvn clean source:jar install -Denforcer.skip=true -Dmaven.test.skip=true
+then
+    exit 1
+fi
+
+# Checkout the original branch
+if ! git checkout $ORIG_BRANCH
+then
+    exit 1
+fi

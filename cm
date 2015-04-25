@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar "L:/bin/CmCommandLine.jar" "$@"
+java -jar ~/bin/CmCommandLine.jar "$@"
