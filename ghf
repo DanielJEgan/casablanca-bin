@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Check there are no uncommitted changes
+if gitismod .
+then
+    echo
+    echo ERROR: There are uncommited changes
+    echo
+    exit 1
+fi
+
+mvn jgitflow:hotfix-finish -Dmaven.javadoc.skip=true

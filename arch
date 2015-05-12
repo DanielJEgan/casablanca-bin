@@ -1,0 +1,34 @@
+#!/bin/bash
+set -e
+
+USAGE="arch sblah>"
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+HASH=`git show -s --format="%H" $1^0`
+ABBR_HASH=`git show -s --format="%h" $1^0`
+MESSAGE=`git show -s --format="%f" $1^0`
+CURRENT_DIR_NAME=`pwd|sed 's,.*/,,'`
+ARCHIVE_ROOT_DIR="$HOME/dev/archives"
+
+if [ ! -d "$ARCHIVE_ROOT_DIR" ]
+then
+    echo
+    echo "   Archive directory $ARCHIVE_ROOT_DIR does not exist or is not a directory"
+    echo
+    exit 1
+fi
+
+echo "HASH: $HASH"
+echo "ABBR_HASH: $ABBR_HASH"
+echo "MESSAGE: $MESSAGE"
+echo "CURRENT_DIR_NAME: $CURRENT_DIR_NAME"
+
+
+git archive -o "$ARCHIVE_ROOT_DIR/""$CURRENT_DIR_NAME""_""$ABBR_HASH""_""$MESSAGE.zip" $HASH
