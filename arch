@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-USAGE="arch sblah>"
+USAGE="arch <commit hash or tag>"
 
 if [ $# -ne 1 ]
 then
@@ -24,11 +24,5 @@ then
     echo
     exit 1
 fi
-
-echo "HASH: $HASH"
-echo "ABBR_HASH: $ABBR_HASH"
-echo "MESSAGE: $MESSAGE"
-echo "CURRENT_DIR_NAME: $CURRENT_DIR_NAME"
-
 
 git archive -o "$ARCHIVE_ROOT_DIR/""$CURRENT_DIR_NAME""_""$ABBR_HASH""_""$MESSAGE.zip" $HASH
