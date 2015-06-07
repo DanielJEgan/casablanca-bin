@@ -1,0 +1,19 @@
+#!/bin/sh
+
+USAGE="dbbackup <databaseName>"
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+DBNAME=$1
+HOST=`hostname|sed 's/\.jirvan\.com$//'|sed 's/\.local$//'`
+TIMESTAMP=`date +%Y%m%d-%H%M`
+
+BACKUP_FILENAME=$HOST-$DBNAME-$TIMESTAMP.backup
+
+pg_dump  -h localhost -U postgres -vFc -f $BACKUP_FILENAME $DBNAME 2> $BACKUP_FILENAME.log

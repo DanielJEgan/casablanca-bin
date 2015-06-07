@@ -1,0 +1,18 @@
+#!/bin/sh
+
+LATEST_HAL_BU_DAY=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd"|tail -1`
+LATEST_HAL_MERCHANTDB_BU_DAY=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd"|tail -1`
+LATEST_MGMCM_BU_DAY=`plink djegan@mgmcm.com.au "ls /var/lib/postgresql/backups/cmprd"|tail -1`
+LATEST_MGMCM_MERCHANTDB_BU_DAY=`plink djegan@mgmcm.com.au "ls /var/lib/postgresql/backups/cmmerchantdataprd"|tail -1`
+
+LATEST_HAL_BU=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd/$LATEST_HAL_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_HAL_MERCHANTDB_BU=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_MGMCM_BU=`plink djegan@mgmcm.com.au "ls /var/lib/postgresql/backups/cmprd/$LATEST_MGMCM_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_MGMCM_MERCHANTDB_BU=`plink djegan@mgmcm.com.au "ls /var/lib/postgresql/backups/cmerchantdatamprd/$LATEST_MGMCM_MERCHANTDB_BU_DAY"|grep '\.backup$'|tail -1`
+
+echo
+echo "   Latest hal BUs: $LATEST_HAL_BU"
+echo "                   $LATEST_HAL_MERCHANTDB_BU"
+echo
+echo "   Latest mgmcm BUs: $LATEST_MGMCM_BU"
+echo "                     $LATEST_MGMCM_MERCHANTDB_BU"

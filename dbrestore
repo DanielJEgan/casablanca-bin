@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+
+if [ $# -ne 2 ]
+then
+    echo
+    echo "   Usage: dbrestore <database/username> <backup file>"
+    echo "          e.g. dbrestore zacdev casablanca-zacdev-20150312-1244.backup"
+    echo
+    exit 1
+fi
+
+DATABASE="$1"
+BACKUP_FILE="$2"
+
+if [ ! -f "$BACKUP_FILE" ]
+then
+    echo
+    echo "  Error: $BACKUP_FILE does not exist"
+    echo
+    exit 1
+fi
+
+
+pg_restore -w -h localhost -U $DATABASE -n public --no-owner -d $DATABASE "$BACKUP_FILE"

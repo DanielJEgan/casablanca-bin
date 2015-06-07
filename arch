@@ -11,12 +11,7 @@ then
     exit 1
 fi
 
-HASH=`git show -s --format="%H" $1^0`
-ABBR_HASH=`git show -s --format="%h" $1^0`
-MESSAGE=`git show -s --format="%f" $1^0`
-CURRENT_DIR_NAME=`pwd|sed 's,.*/,,'`
 ARCHIVE_ROOT_DIR="$HOME/dev/archives"
-
 if [ ! -d "$ARCHIVE_ROOT_DIR" ]
 then
     echo
@@ -25,4 +20,27 @@ then
     exit 1
 fi
 
-git archive -o "$ARCHIVE_ROOT_DIR/""$CURRENT_DIR_NAME""_""$ABBR_HASH""_""$MESSAGE.zip" $HASH
+HASH=`git show -s --format="%H" $1^0`
+ABBR_HASH=`git show -s --format="%h" $1^0`
+MESSAGE=`git show -s --format="%f" $1^0`
+CURRENT_DIR_NAME=`pwd|sed 's,.*/,,'`
+
+if [ "$1" = "HEAD" ]
+then
+
+    BRANCH=`git symbolic-ref --short HEAD`
+
+    git archive -o "$ARCHIVE_ROOT_DIR/""$CURRENT_DIR_NAME""_""$BRANCH""_"`date +%Y%m%d-%H%M`"_""$ABBR_HASH"".zip" HEAD
+
+else
+
+    if [ "$1" = "$HASH" -o "$1" = "$HASH" ]
+    then
+        ARCHIVE_TITLE=$MESSAGE
+    else
+        ARCHIVE_TITLE=$1
+    fi
+
+    git archive -o "$ARCHIVE_ROOT_DIR/""$CURRENT_DIR_NAME""_""$ARCHIVE_TITLE""_""$ABBR_HASH"".zip" $HASH
+
+fi
