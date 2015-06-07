@@ -1,0 +1,44 @@
+#!/bin/sh
+
+LATEST_HAL_BU_DAY=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd"|tail -1`
+LATEST_NATASHA_BU_DAY=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/natasha/cmprd"|tail -1`
+LATEST_HAL_MERCHANTDB_BU_DAY=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd"|tail -1`
+
+LATEST_HAL_BU=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd/$LATEST_HAL_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_NATASHA_BU=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/natasha/cmprd/$LATEST_HAL_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_HAL_MERCHANTDB_BU=`plink djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY"|grep '\.backup$'|tail -1`
+
+LOCAL_HAL_BU_DIR="L:/backups/cm/hal/cmprd/$LATEST_HAL_BU_DAY"
+LOCAL_NATASHA_BU_DIR="L:/backups/cm/natasha/cmprd/$LATEST_NATASHA_BU_DAY"
+LOCAL_HAL_MERCHANTDB_BU_DIR="L:/backups/cm/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY"
+
+
+echo
+echo "Copying $LATEST_HAL_BU to $LOCAL_HAL_BU_DIR"
+if test -e "$LOCAL_HAL_BU_DIR/$LATEST_HAL_BU"
+then
+    echo $LOCAL_HAL_BU_DIR/$LATEST_HAL_BU already exists.
+else
+    mkdir -p "$LOCAL_HAL_BU_DIR"
+    pscp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/hal/cmprd/$LATEST_HAL_BU_DAY/$LATEST_HAL_BU $LOCAL_HAL_BU_DIR
+fi
+
+echo
+echo "Copying $LATEST_NATASHA_BU to $LOCAL_NATASHA_BU_DIR"
+if test -e "$LOCAL_NATASHA_BU_DIR/$LATEST_NATASHA_BU"
+then
+    echo $LOCAL_NATASHA_BU_DIR/$LATEST_NATASHA_BU already exists.
+else
+    mkdir -p "$LOCAL_NATASHA_BU_DIR"
+    pscp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/natasha/cmprd/$LATEST_NATASHA_BU_DAY/$LATEST_NATASHA_BU $LOCAL_NATASHA_BU_DIR
+fi
+
+echo
+echo "Copying $LATEST_HAL_MERCHANTDB_BU to $LOCAL_HAL_MERCHANTDB_BU_DIR"
+if test -e "$LOCAL_HAL_MERCHANTDB_BU_DIR/$LATEST_HAL_MERCHANTDB_BU"
+then
+    echo $LOCAL_HAL_MERCHANTDB_BU_DIR/$LATEST_HAL_MERCHANTDB_BU already exists.
+else
+    mkdir -p "$LOCAL_HAL_MERCHANTDB_BU_DIR"
+    pscp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY/$LATEST_HAL_MERCHANTDB_BU $LOCAL_HAL_MERCHANTDB_BU_DIR
+fi
