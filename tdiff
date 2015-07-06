@@ -1,0 +1,66 @@
+#!/bin/bash
+set -e
+COMMAND_BASENAME=`basename $0`
+
+USAGE="tdiff [tree-ish] [tree-ish]
+    If no parameters are given then the current HEAD and the working directory tree are compared,
+    if one parameter is given then that tree-ish (commit, tag or tree)  and the working directory tree are compared,
+    if two parameters are given then those tree-ishes are compared"
+
+if [ $# -eq 0 ]
+then
+    ABBR_HASH=`git show -s --format="%h" HEAD^0`
+    ARG1=`mktemp "/tmp/HEAD-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
+    git archive -o "$ARG1" HEAD
+    ARG2="."
+elif [ $# -eq 1 ]
+then
+    HASH=`git show -s --format="%H" $1^0`
+    ABBR_HASH=`git show -s --format="%h" $1^0`
+    MESSAGE=`git show -s --format="%f" $1^0`
+    if [ "$1" = "$HASH" ]
+    then
+        ARCHIVE_TITLE=${MESSAGE}
+    else
+        ARCHIVE_TITLE=${1}
+    fi
+    ARG1=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
+    git archive -o "$ARG1" "$1"
+    ARG2="."
+elif [ $# -eq 2 ]
+then
+
+    HASH=`git show -s --format="%H" $1^0`
+    ABBR_HASH=`git show -s --format="%h" $1^0`
+    MESSAGE=`git show -s --format="%f" $1^0`
+    if [ "$1" = "$HASH" ]
+    then
+        ARCHIVE_TITLE=${MESSAGE}
+    else
+        ARCHIVE_TITLE=${1}
+    fi
+    ARG1=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
+    git archive -o "$ARG1" "$1"
+
+    HASH=`git show -s --format="%H" $2^0`
+    ABBR_HASH=`git show -s --format="%h" $2^0`
+    MESSAGE=`git show -s --format="%f" $2^0`
+    if [ "$2" = "$HASH" ]
+    then
+        ARCHIVE_TITLE=${MESSAGE}
+    else
+        ARCHIVE_TITLE=${2}
+    fi
+    ARG2=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
+    git archive -o "$ARG2" "$2"
+
+else
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+
+
+bcompare -expandall "$ARG1" "$ARG2"
