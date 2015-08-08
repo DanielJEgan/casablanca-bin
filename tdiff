@@ -20,9 +20,9 @@ then
     MESSAGE=`git show -s --format="%f" $1^0`
     if [ "$1" = "$HASH" ]
     then
-        ARCHIVE_TITLE=${MESSAGE}
+        ARCHIVE_TITLE=`echo $MESSAGE|sed 's,/,-,g'`
     else
-        ARCHIVE_TITLE=${1}
+        ARCHIVE_TITLE=`echo ${1}|sed 's,/,-,g'`
     fi
     ARG1=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
     git archive -o "$ARG1" "$1"
@@ -35,9 +35,9 @@ then
     MESSAGE=`git show -s --format="%f" $1^0`
     if [ "$1" = "$HASH" ]
     then
-        ARCHIVE_TITLE=${MESSAGE}
+        ARCHIVE_TITLE=`echo $MESSAGE|sed 's,/,-,g'`
     else
-        ARCHIVE_TITLE=${1}
+        ARCHIVE_TITLE=`echo ${1}|sed 's,/,-,g'`
     fi
     ARG1=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
     git archive -o "$ARG1" "$1"
@@ -47,9 +47,9 @@ then
     MESSAGE=`git show -s --format="%f" $2^0`
     if [ "$2" = "$HASH" ]
     then
-        ARCHIVE_TITLE=${MESSAGE}
+        ARCHIVE_TITLE=`echo $MESSAGE|sed 's,/,-,g'`
     else
-        ARCHIVE_TITLE=${2}
+        ARCHIVE_TITLE=`echo ${2}|sed 's,/,-,g'`
     fi
     ARG2=`mktemp "/tmp/${ARCHIVE_TITLE}-${ABBR_HASH}.${COMMAND_BASENAME}.tmpXXXXXXXXXX"`.zip || exit 1
     git archive -o "$ARG2" "$2"
