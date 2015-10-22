@@ -1,0 +1,59 @@
+#!/bin/bash
+
+source gitlib.sh
+
+verifyNoUncommittedChanges
+verifyNoUnpushedCommits
+verifyHeadIsNotDetached
+ORIG_BRANCH=`git branch| grep '^\* '|sed 's/\* //'`
+verifyCurrentBranch "$ORIG_BRANCH" "master"
+
+# Get the version
+RELEASE_VERSION=`extractNonSnapshotVersionIfPresent`
+while true; do
+    echo
+    read -p "   Release version [$RELEASE_VERSION] ? " value
+    if [ "$value" != "" ]
+    then
+        filteredValue=`filterOutInvalidNonSnapshotVersions "$value"`
+        if [ "$filteredValue" = "" ]
+        then
+            echo "   \"$value\" is an invalid version, please enter the release version"
+        else
+            RELEASE_VERSION="$filteredValue"
+            break
+        fi
+    else
+        if [ "$RELEASE_VERSION" = "" ]
+        then
+            echo "   Please enter the release version"
+        else
+            break
+        fi
+    fi
+done
+
+verifyTagDoesNotExist "v$RELEASE_VERSION"
+
+# Get the last release candidate number
+LAST_RELEASE_CANDIDATE_NUMBER=`git tag|egrep '^v'$RELEASE_VERSION'_rc[0-9]+$'|sed 's/v'$RELEASE_VERSION'_rc/'/|sort|tail -n 1`
+
+if [ "$LAST_RELEASE_CANDIDATE_NUMBER" = "" ]
+then
+    echo
+    echo "ERROR: There are no release candidates for $RELEASE_VERSION"
+    echo
+    exit 1
+else
+    RELEASE_CANDIDATE_VERSION="$RELEASE_VERSION""_rc""$LAST_RELEASE_CANDIDATE_NUMBER"
+fi
+
+confimBeforeProceeding "   Do you wish to create release $RELEASE_VERSION from release candidate $RELEASE_CANDIDATE_VERSION (y/n) ?"
+
+
+echo "RELEASE_VERSION = \"$RELEASE_VERSION\""
+echo "LAST_RELEASE_CANDIDATE_NUMBER = \"$LAST_RELEASE_CANDIDATE_NUMBER\""
+
+verifyPomFileHasANonSnapshotVersion
+
+

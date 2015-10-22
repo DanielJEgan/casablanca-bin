@@ -53,6 +53,19 @@ function headDetached {
 
 }
 
+function verifyCurrentBranch {
+
+    # Check current branch
+    if [ "$1" != "$2" ]
+    then
+        echo
+        echo "ERROR: You are not on the $2 branch (you are on $1)"
+        echo
+        exit 1
+    fi
+
+}
+
 function verifyNoUncommittedChanges {
 
     # Check there are no uncommitted changes
@@ -79,10 +92,30 @@ function verifyNoUnpushedCommits {
 
 }
 
+function verifyTagDoesNotExist {
+
+    if git tag|egrep '^'$1'$' >/dev/null
+    then
+        echo
+        echo ERROR: Tag $1 exists
+        echo
+        exit 1
+    fi
+
+    if git ls-remote --tags origin|egrep '.*refs/tags/'$1'$' >/dev/null
+    then
+        echo
+        echo ERROR: Tag $1 exists at origin
+        echo
+        exit 1
+    fi
+
+}
+
 function verifyPomFileHasASnapshotVersion {
 
-    # Check valid current version in pom file
-    if ! mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$' >/dev/null
+    # Check valid snapshot version in pom file
+    if ! mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9.]*[0-9]+-SNAPSHOT$' >/dev/null
     then
         echo
         echo ERROR: Project does not seem to have a -SNAPSHOT version
@@ -90,6 +123,29 @@ function verifyPomFileHasASnapshotVersion {
         exit 1
     fi
 
+}
+
+function extractNonSnapshotVersionIfPresent {
+
+    mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9.]*[0-9]+$'|sed 's/^\[INFO\] Building .* //'
+
+}
+
+function verifyPomFileHasANonSnapshotVersion {
+
+    # Check valid snapshot version in pom file
+    if ! mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9.]*[0-9]+$' >/dev/null
+    then
+        echo
+        echo "ERROR: Project does not seem to have a valid (non-SNAPSHOT) version"
+        echo
+        exit 1
+    fi
+
+}
+
+function filterOutInvalidNonSnapshotVersions {
+    echo $1 | egrep '^[0-9]+\.[0-9.]*[0-9]+$'
 }
 
 function verifyHeadIsNotDetached {
