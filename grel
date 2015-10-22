@@ -1,9 +1,10 @@
 #!/bin/bash
 
-echo flag1
-
 source gitlib.sh
 
-echo flag2
+echo flag1
 
 verifyNoUncommittedChanges
+verifyNoUnpushedCommits
+
+echo flag2
