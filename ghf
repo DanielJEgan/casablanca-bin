@@ -9,4 +9,4 @@ then
     exit 1
 fi
 
-mvn jgitflow:hotfix-finish -Dmaven.javadoc.skip=true
+mvn jgitflow:hotfix-finish -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
