@@ -35,6 +35,24 @@ function unpushedCommitsExist {
 
 }
 
+function headDetached {
+
+    if [ "$1" = "" ]
+    then
+        ROOT_DIR="."
+    else
+        ROOT_DIR="$1"
+    fi
+
+    if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep 'HEAD detached'|wc -l` -gt 0 ]
+    then
+        return 0
+    else
+        return 1
+    fi
+
+}
+
 function verifyNoUncommittedChanges {
 
     # Check there are no uncommitted changes
@@ -68,6 +86,20 @@ function verifyPomFileHasASnapshotVersion {
     then
         echo
         echo ERROR: Project does not seem to have a -SNAPSHOT version
+        echo
+        exit 1
+    fi
+
+}
+
+function verifyHeadIsNotDetached {
+
+
+    # Check there are no "un-pushed" commits
+    if headDetached .
+    then
+        echo
+        echo "ERROR: The head is detached (you are not at the head of the current branch)"
         echo
         exit 1
     fi
