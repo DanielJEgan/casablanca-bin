@@ -60,3 +60,16 @@ function verifyNoUnpushedCommits {
     fi
 
 }
+
+function verifyPomFileHasASnapshotVersion {
+
+    # Check valid current version in pom file
+    if ! mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$' >/dev/null
+    then
+        echo
+        echo ERROR: Project does not seem to have a -SNAPSHOT version
+        echo
+        exit 1
+    fi
+
+}

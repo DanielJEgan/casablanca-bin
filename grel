@@ -6,5 +6,6 @@ echo flag1
 
 verifyNoUncommittedChanges
 verifyNoUnpushedCommits
+verifyPomFileHasASnapshotVersion
 
 echo flag2
