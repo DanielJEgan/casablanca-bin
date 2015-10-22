@@ -51,9 +51,24 @@ fi
 confimBeforeProceeding "   Do you wish to create release $RELEASE_VERSION from release candidate $RELEASE_CANDIDATE_VERSION (y/n) ?"
 
 
+
+# Checkout the release candidate tag and then branch from it to a temp branch
+if ! git checkout "vRELEASE_CANDIDATE_VERSION"
+then
+    exit 1
+fi
+TEMP_BRANCH="v$RELEASE_VERSION""_tmpBranch"
+if ! git checkout -b $TEMP_BRANCH
+then
+    exit 1
+fi
+
+
+
+
+
+
+
+
 echo "RELEASE_VERSION = \"$RELEASE_VERSION\""
 echo "LAST_RELEASE_CANDIDATE_NUMBER = \"$LAST_RELEASE_CANDIDATE_NUMBER\""
-
-verifyPomFileHasANonSnapshotVersion
-
-

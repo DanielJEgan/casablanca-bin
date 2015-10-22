@@ -177,3 +177,8 @@ function confimBeforeProceeding {
     echo
 
 }
+
+function createAPomVersionModifiedAndTaggedVersionOnATempBranch {
+
+
+}
