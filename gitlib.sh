@@ -26,7 +26,7 @@ function unpushedCommitsExist {
         ROOT_DIR="$1"
     fi
 
-    if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep '# Your branch is ahead'|wc -l` -gt 0 ]
+    if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep 'Your branch is ahead'|wc -l` -gt 0 ]
     then
         echo flag unpushedCommitsExist true
         return 0
