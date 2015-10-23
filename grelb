@@ -1,0 +1,64 @@
+#!/bin/bash
+
+source gitlib.sh
+
+verifyNoUncommittedChanges
+verifyNoUnpushedCommits
+
+# Get the version to branch from
+RELEASE_VERSION=`printMostRecentVersion`
+while true; do
+    echo
+    if [ "$RELEASE_VERSION" != "" ]
+    then
+        read -p "   Release version to branch from [$RELEASE_VERSION] ? " value
+    else
+        read -p "   Release version to branch from ? " value
+    fi
+    if [ "$value" != "" ]
+    then
+        filteredValue=`filterOutInvalidVersions "$value"`
+        if [ "$filteredValue" = "" ]
+        then
+            echo "   \"$value\" is an invalid version, please re-enter"
+        else
+            RELEASE_VERSION="$filteredValue"
+            break
+        fi
+    else
+        if [ "$RELEASE_VERSION" = "" ]
+        then
+            echo "   Please enter the release version to branch from"
+        else
+            break
+        fi
+    fi
+done
+
+# Get the branch name
+BRANCH_NAME=""
+while true; do
+    echo
+    if [ "$BRANCH_NAME" != "" ]
+    then
+        read -p "   New branch name [$BRANCH_NAME] ? " value
+    else
+        read -p "   New branch name ? " value
+    fi
+    if [ "$value" != "" ]
+    then
+        BRANCH_NAME="$value"
+        break
+    else
+        echo "   Please enter the release version to branch from"
+    fi
+done
+
+MINOR_RELEASE=`echo $RELEASE_VERSION|sed 's/.*\.//'`
+NEXT_SNAPSHOT_VERSION=`echo $RELEASE_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))-SNAPSHOT
+
+checkout "v$RELEASE_VERSION"
+checkoutOnANewBranch "$BRANCH_NAME"
+updatePomfileVersions "$NEXT_SNAPSHOT_VERSION"
+addAllModificationsAndCommitWithMessage "Updating poms for ""$NEXT_SNAPSHOT_VERSION"" development"
+echo

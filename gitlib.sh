@@ -1,11 +1,10 @@
-
 function modificationsExist {
 
     if [ "$1" = "" ]
     then
-        ROOT_DIR="."
+        local ROOT_DIR="."
     else
-        ROOT_DIR="$1"
+        local ROOT_DIR="$1"
     fi
 
     if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status --porcelain|wc -l` -gt 0 ]
@@ -21,9 +20,9 @@ function unpushedCommitsExist {
 
     if [ "$1" = "" ]
     then
-        ROOT_DIR="."
+        local ROOT_DIR="."
     else
-        ROOT_DIR="$1"
+        local ROOT_DIR="$1"
     fi
 
     if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep 'Your branch is ahead'|wc -l` -gt 0 ]
@@ -39,9 +38,9 @@ function headDetached {
 
     if [ "$1" = "" ]
     then
-        ROOT_DIR="."
+        local ROOT_DIR="."
     else
-        ROOT_DIR="$1"
+        local ROOT_DIR="$1"
     fi
 
     if [ `git --git-dir="$ROOT_DIR/.git" --work-tree="$ROOT_DIR" status|grep 'HEAD detached'|wc -l` -gt 0 ]
@@ -112,6 +111,19 @@ function verifyTagDoesNotExist {
 
 }
 
+function verifyTagDoesNotExist {
+
+
+    if git ls-remote --tags origin|egrep '.*refs/tags/'$1'$' >/dev/null
+    then
+        echo
+        echo ERROR: Tag $1 exists at origin
+        echo
+        exit 1
+    fi
+
+}
+
 function verifyPomFileHasASnapshotVersion {
 
     # Check valid snapshot version in pom file
@@ -131,6 +143,22 @@ function extractNonSnapshotVersionIfPresent {
 
 }
 
+function extractSnapshotVersionIfPresent {
+
+    mvn blah|egrep '^\[INFO\] Building .+ [0-9]+\.[0-9.]*[0-9]+-SNAPSHOT$'|sed 's/^\[INFO\] Building .* //'
+
+}
+
+function extractVersionFromNonSnapshotVersionIfPresent {
+
+    local SNAPSHOT_VERSION=`extractSnapshotVersionIfPresent`
+    if [ "$SNAPSHOT_VERSION" != "" ]
+    then
+        echo $SNAPSHOT_VERSION | sed 's/-SNAPSHOT$//'
+    fi
+
+}
+
 function verifyPomFileHasANonSnapshotVersion {
 
     # Check valid snapshot version in pom file
@@ -144,7 +172,7 @@ function verifyPomFileHasANonSnapshotVersion {
 
 }
 
-function filterOutInvalidNonSnapshotVersions {
+function filterOutInvalidVersions {
     echo $1 | egrep '^[0-9]+\.[0-9.]*[0-9]+$'
 }
 
@@ -178,7 +206,120 @@ function confimBeforeProceeding {
 
 }
 
-function createAPomVersionModifiedAndTaggedVersionOnATempBranch {
+function checkout {
 
+    echo "  - Checking out $1"
+    if ! git checkout -q "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function checkoutOnANewBranch {
+
+    echo "  - Creating new branch $1"
+    if ! git checkout -q --no-track -b "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function checkoutOnANewBranchAndTrack {
+
+    echo "  - Creating new branch $1"
+    if ! git checkout -q --track -b "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function deleteBranch {
+
+    echo "  - Deleting branch $1"
+    if ! git branch -q -D "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function updatePomfileVersions {
+
+    echo "  - Setting POM file version to $1"
+    if ! mvn versions:set -q -DgenerateBackupPoms=false -DnewVersion=$1 >/dev/null
+    then
+        exit 1
+    fi
+
+}
+
+function addAllModificationsAndCommitWithMessage {
+
+    echo "  - Adding and committing all modifications"
+    if ! git add -A
+    then
+        exit 1
+    fi
+    if ! git commit -q -m "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function tagAndPushTagToOrigin {
+
+    echo "  - Creating tag $1 and pushing to origin"
+    if ! git tag $1
+    then
+        exit 1
+    fi
+    if ! git push -q origin "$1"
+    then
+        exit 1
+    fi
+
+}
+
+function printMostRecentVersion {
+
+    git ls-remote --tags origin | egrep '.*refs/tags/v[0-9]+\.[0-9.]*[0-9]+$'|sed 's,.*refs/tags/v,,'|sort -t . -n -k 1,1 -k 2,2 -k 3,3 -k 4,4 -k 5,5 -k 6,6 -k 7,7 -k 8,8 -k 9,9 | tail -1
+
+}
+
+function printNextVersion {
+
+    local LAST_VERSION=`printMostRecentVersion`
+    if [ "$LAST_VERSION" != "" ]
+    then
+
+        local MINOR_RELEASE=`echo $LAST_VERSION|sed 's/.*\.//'`
+        local NEXT_VERSION=`echo $LAST_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))
+        echo $NEXT_VERSION
+    else
+
+        echo "1.0.1"
+
+    fi
+
+}
+
+function verifyIsNextVersion {
+
+    local _NEXT_VERSION=`printNextVersion`
+    if [ "$_NEXT_VERSION" = "" ]
+    then
+        return 0
+    fi
+    if [ "$1" != "$_NEXT_VERSION" ]
+    then
+        echo
+        echo "ERROR: $1 is not the next version ($_NEXT_VERSION)"
+        echo
+        exit 1
+    fi
 
 }

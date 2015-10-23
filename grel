@@ -6,19 +6,23 @@ verifyNoUncommittedChanges
 verifyNoUnpushedCommits
 verifyHeadIsNotDetached
 ORIG_BRANCH=`git branch| grep '^\* '|sed 's/\* //'`
-verifyCurrentBranch "$ORIG_BRANCH" "master"
 
 # Get the version
-RELEASE_VERSION=`extractNonSnapshotVersionIfPresent`
+RELEASE_VERSION=`printNextVersion`
 while true; do
     echo
-    read -p "   Release version [$RELEASE_VERSION] ? " value
+    if [ "$RELEASE_VERSION" != "" ]
+    then
+        read -p "   Release version [$RELEASE_VERSION] ? " value
+    else
+        read -p "   Release version ? " value
+    fi
     if [ "$value" != "" ]
     then
-        filteredValue=`filterOutInvalidNonSnapshotVersions "$value"`
+        filteredValue=`filterOutInvalidVersions "$value"`
         if [ "$filteredValue" = "" ]
         then
-            echo "   \"$value\" is an invalid version, please enter the release version"
+            echo "   \"$value\" is an invalid version, please re-enter"
         else
             RELEASE_VERSION="$filteredValue"
             break
@@ -50,25 +54,22 @@ fi
 
 confimBeforeProceeding "   Do you wish to create release $RELEASE_VERSION from release candidate $RELEASE_CANDIDATE_VERSION (y/n) ?"
 
-
-
-# Checkout the release candidate tag and then branch from it to a temp branch
-if ! git checkout "vRELEASE_CANDIDATE_VERSION"
-then
-    exit 1
-fi
+# Create a POM version modified and tagged version on a temp branch then return to original branch
 TEMP_BRANCH="v$RELEASE_VERSION""_tmpBranch"
-if ! git checkout -b $TEMP_BRANCH
-then
-    exit 1
-fi
+checkout "v$RELEASE_CANDIDATE_VERSION"
+checkoutOnANewBranch $TEMP_BRANCH
+updatePomfileVersions $RELEASE_VERSION
+addAllModificationsAndCommitWithMessage "v"$RELEASE_VERSION
+tagAndPushTagToOrigin v$RELEASE_VERSION
+checkout $ORIG_BRANCH
+deleteBranch $TEMP_BRANCH
 
+# Update POM version to snapshot version after confirmation
+MINOR_RELEASE=`echo $RELEASE_VERSION|sed 's/.*\.//'`
+NEXT_SNAPSHOT_VERSION=`echo $RELEASE_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))-SNAPSHOT
+confimBeforeProceeding "   Do you wish to update the POM version to $NEXT_SNAPSHOT_VERSION on the $ORIG_BRANCH branch (y/n) ?"
+updatePomfileVersions $NEXT_SNAPSHOT_VERSION
+addAllModificationsAndCommitWithMessage "Updating poms for $NEXT_SNAPSHOT_VERSION development"
+git push -q
 
-
-
-
-
-
-
-echo "RELEASE_VERSION = \"$RELEASE_VERSION\""
-echo "LAST_RELEASE_CANDIDATE_NUMBER = \"$LAST_RELEASE_CANDIDATE_NUMBER\""
+echo
