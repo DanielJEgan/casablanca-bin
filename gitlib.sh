@@ -322,3 +322,44 @@ function verifyIsNextVersion {
     fi
 
 }
+
+function chooseReleaseCandidateVersion {
+
+    local candidates=( $(git ls-remote --tags origin | egrep '.*refs/tags/v[0-9]+\.[0-9.]*[0-9]+_rc[0-9]+$'|sed 's,.*refs/tags/v,,') )
+
+    echo
+    echo "  Please choose a release candidate"
+    echo
+
+    for i in `seq 0 $((${#candidates[@]} - 1))`;
+    do
+        printf "  %3d:  %s\n" $(($i + 1)) ${candidates[$i]}
+    done
+
+    local CHOICE=""
+    while true; do
+        echo
+        if [ "$CHOICE" != "" ]
+        then
+            read -p "   Choose a number [$CHOICE] ? " value
+        else
+            read -p "   Choose a number ? " value
+        fi
+        if [ "$value" != "" ]
+        then
+            let numberChoice=0+$value
+            if [ $numberChoice -lt 1 ] || [ $numberChoice -gt ${#candidates[@]} ]
+            then
+                echo "   $value is not a valid choice, please re-enter"
+            else
+                local CHOICE="$numberChoice"
+                break
+            fi
+        else
+            echo "   Please enter the number of the item to choose"
+        fi
+    done
+
+    RELEASE_CANDIDATE_VERSION=${candidates[$(($CHOICE - 1))]}
+
+}
