@@ -91,7 +91,7 @@ function verifyNoUnpushedCommits {
 
 }
 
-function verifyTagDoesNotExist {
+function verifyLocalTagDoesNotExist {
 
     if git tag|egrep '^'$1'$' >/dev/null
     then
@@ -101,18 +101,17 @@ function verifyTagDoesNotExist {
         exit 1
     fi
 
-    if git ls-remote --tags origin|egrep '.*refs/tags/'$1'$' >/dev/null
-    then
-        echo
-        echo ERROR: Tag $1 exists at origin
-        echo
-        exit 1
-    fi
-
 }
 
 function verifyTagDoesNotExist {
 
+    if git tag|egrep '^'$1'$' >/dev/null
+    then
+        echo
+        echo ERROR: Tag $1 exists
+        echo
+        exit 1
+    fi
 
     if git ls-remote --tags origin|egrep '.*refs/tags/'$1'$' >/dev/null
     then
