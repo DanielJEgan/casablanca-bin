@@ -35,6 +35,15 @@ while true; do
     fi
 done
 
+printMostRecentBranchVersionFor $RELEASE_VERSION
+LAST_BRANCH_VERSION=`printMostRecentBranchVersionFor $RELEASE_VERSION`
+echo "LAST_BRANCH_VERSION = \"$LAST_BRANCH_VERSION\""
+
+#printMostRecentBranchVersionFor $RELEASE_VERSION
+printNextBranchVersionFor $RELEASE_VERSION
+NEXT_BRANCH_VERSION=`printNextBranchVersionFor $RELEASE_VERSION`
+echo "NEXT_BRANCH_VERSION = \"$NEXT_BRANCH_VERSION\""
+
 # Get the branch name
 BRANCH_NAME=""
 while true; do
@@ -50,15 +59,12 @@ while true; do
         BRANCH_NAME="$value"
         break
     else
-        echo "   Please enter the release version to branch from"
+        echo "   Please enter the new branch name"
     fi
 done
 
-MINOR_RELEASE=`echo $RELEASE_VERSION|sed 's/.*\.//'`
-NEXT_SNAPSHOT_VERSION=`echo $RELEASE_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))-SNAPSHOT
-
 checkout "v$RELEASE_VERSION"
 checkoutOnANewBranch "$BRANCH_NAME"
-updatePomfileVersions "$NEXT_SNAPSHOT_VERSION"
-addAllModificationsAndCommitWithMessage "Updating poms for ""$NEXT_SNAPSHOT_VERSION"" development"
+updatePomfileVersions "$NEXT_BRANCH_VERSION"-SNAPSHOT
+addAllModificationsAndCommitWithMessage "Updating poms for ""$NEXT_BRANCH_VERSION""-SNAPSHOT development"
 echo

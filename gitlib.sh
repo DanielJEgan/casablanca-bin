@@ -306,6 +306,34 @@ function printNextVersion {
 
 }
 
+function printMostRecentBranchVersionFor {
+
+    local PARENT_VERSION=$1
+
+    git ls-remote --tags origin | egrep '.*refs/tags/v'"$PARENT_VERSION"'\.[0-9][0-9]*$'|sed 's,.*refs/tags/v,,'|sort -t . -n -k 1,1 -k 2,2 -k 3,3 -k 4,4 -k 5,5 -k 6,6 -k 7,7 -k 8,8 -k 9,9 | tail -1
+
+}
+
+
+function printNextBranchVersionFor {
+
+    local PARENT_VERSION=$1
+    local LAST_BRANCH_VERSION=`printMostRecentBranchVersionFor $PARENT_VERSION`
+    if [ "$LAST_BRANCH_VERSION" != "" ]
+    then
+
+        local MINOR_RELEASE=`echo $LAST_BRANCH_VERSION|sed 's/.*\.//'`
+        local NEXT_BRANCH_VERSION=`echo $LAST_BRANCH_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))
+        echo $NEXT_BRANCH_VERSION
+
+    else
+
+        echo $PARENT_VERSION".1"
+
+    fi
+
+}
+
 function verifyIsNextVersion {
 
     local _NEXT_VERSION=`printNextVersion`
@@ -327,9 +355,24 @@ function chooseReleaseCandidateVersion {
 
     local candidates=( $(git ls-remote --tags origin | egrep '.*refs/tags/v[0-9]+\.[0-9.]*[0-9]+_rc[0-9]+$'|sed 's,.*refs/tags/v,,') )
 
-    echo
-    echo "  Please choose a release candidate"
-    echo
+    if [ ${#candidates[@]} -lt 1 ]
+    then
+        echo
+        echo "ERROR: There are no release candidates currently available"
+        echo "       from which to create a release"
+        echo
+        exit 1
+    elif [ ${#candidates[@]} -eq 1 ]
+    then
+        echo
+        echo "   There is currently only one release candidate (${candidates[0]})"
+        RELEASE_CANDIDATE_VERSION=${candidates[0]}
+        return 0
+    else
+        echo
+        echo "  Please choose a release candidate"
+        echo
+    fi
 
     for i in `seq 0 $((${#candidates[@]} - 1))`;
     do
@@ -361,5 +404,39 @@ function chooseReleaseCandidateVersion {
     done
 
     RELEASE_CANDIDATE_VERSION=${candidates[$(($CHOICE - 1))]}
+
+}
+
+function archiveRedundantReleaseCandidateTags {
+
+    local RELEASE_VERSION="$1"
+    local candidates=( $(git ls-remote --tags origin | egrep '.*refs/tags/v'$RELEASE_VERSION'_rc[0-9]+$'|sed 's,.*refs/tags/v,,') )
+
+    for i in `seq 0 $((${#candidates[@]} - 1))`;
+    do
+
+        local oldTag="v${candidates[$i]}"
+        local archiveTag="archive/v${candidates[$i]}"
+
+        echo "  - Creating tag $archiveTag and pushing to origin"
+        if ! git tag "$archiveTag" "$oldTag"
+        then
+            exit 1
+        fi
+        if ! git push -q origin "$archiveTag"
+        then
+            exit 1
+        fi
+        echo "  - Deleting tag $oldTag locally and at origin"
+        if ! git tag -d $oldTag >/dev/null
+        then
+            exit 1
+        fi
+        if ! git push origin :"$oldTag" 2>/dev/null
+        then
+            exit 1
+        fi
+
+    done
 
 }

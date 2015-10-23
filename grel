@@ -25,6 +25,9 @@ tagAndPushTagToOrigin v$RELEASE_VERSION
 checkout $ORIG_BRANCH
 deleteBranch $TEMP_BRANCH
 
+# Archive redundant release candidate tags
+archiveRedundantReleaseCandidateTags $RELEASE_VERSION
+
 # Update POM version to snapshot version after confirmation
 MINOR_RELEASE=`echo $RELEASE_VERSION|sed 's/.*\.//'`
 NEXT_SNAPSHOT_VERSION=`echo $RELEASE_VERSION|sed 's/[^.]*$//'`$(($MINOR_RELEASE + 1))-SNAPSHOT
