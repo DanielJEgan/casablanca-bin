@@ -1,0 +1,6 @@
+#!/bin/bash
+source sqlremotelib.sh
+
+runOnServer $1 "$2"
+
+echo

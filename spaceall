@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo
+echo jack
+ssh djegan@jack.collectionsmanager.com.au 'df -h'|grep '^/dev'
+
+echo
+echo ethan
+ssh onebox@ethan.onebox.net.au 'df -h'|grep '^/dev'
+
+echo
+echo karen
+ssh onebox@karen.onebox.net.au 'df -h'|grep '^/dev'
+
+echo
+echo fergus
+ssh onebox@fergus.onebox.net.au 'df -h'|grep '^/dev'
+
+echo
+echo vlad
+ssh onebox@vlad.onebox.net.au 'df -h'|grep '^/dev'
+echo

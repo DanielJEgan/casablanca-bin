@@ -1,0 +1,6 @@
+#!/bin/bash
+source getbulib.sh
+
+getLatestBackupForServer $1
+
+echo

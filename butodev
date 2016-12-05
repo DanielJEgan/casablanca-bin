@@ -1,0 +1,9 @@
+#!/bin/bash
+set -u
+set -e
+source getbulib.sh
+
+#getLatestBackupForServer $1
+restoreLatestLocalBackupForServer $1
+
+echo

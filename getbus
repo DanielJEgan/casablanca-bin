@@ -1,0 +1,9 @@
+#!/bin/bash
+source getbulib.sh
+
+getLatestBackupForServer ethan
+getLatestBackupForServer karen
+getLatestBackupForServer fergus
+getLatestBackupForServer vlad
+
+echo

@@ -2,14 +2,17 @@
 
 LATEST_HAL_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd"|tail -1`
 LATEST_NATASHA_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/natasha/cmprd"|tail -1`
+LATEST_ETHAN_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/ethan/cmprd"|tail -1`
 LATEST_HAL_MERCHANTDB_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd"|tail -1`
 
 LATEST_HAL_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmprd/$LATEST_HAL_BU_DAY"|grep '\.backup$'|tail -1`
-LATEST_NATASHA_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/natasha/cmprd/$LATEST_HAL_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_NATASHA_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/natasha/cmprd/$LATEST_NATASHA_BU_DAY"|grep '\.backup$'|tail -1`
+LATEST_ETHAN_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/ethan/cmprd/$LATEST_ETHAN_BU_DAY"|grep '\.backup$'|tail -1`
 LATEST_HAL_MERCHANTDB_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY"|grep '\.backup$'|tail -1`
 
 LOCAL_HAL_BU_DIR="/Users/djegan/backups/cm/hal/cmprd/$LATEST_HAL_BU_DAY"
 LOCAL_NATASHA_BU_DIR="/Users/djegan/backups/cm/natasha/cmprd/$LATEST_NATASHA_BU_DAY"
+LOCAL_ETHAN_BU_DIR="/Users/djegan/backups/cm/ethan/cmprd/$LATEST_ETHAN_BU_DAY"
 LOCAL_HAL_MERCHANTDB_BU_DIR="/Users/djegan/backups/cm/hal/cmmerchantdataprd/$LATEST_HAL_MERCHANTDB_BU_DAY"
 
 
@@ -31,6 +34,16 @@ then
 else
     mkdir -p "$LOCAL_NATASHA_BU_DIR"
     scp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/natasha/cmprd/$LATEST_NATASHA_BU_DAY/$LATEST_NATASHA_BU $LOCAL_NATASHA_BU_DIR
+fi
+
+echo
+echo "Copying $LATEST_ETHAN_BU to $LOCAL_ETHAN_BU_DIR"
+if test -e "$LOCAL_ETHAN_BU_DIR/$LATEST_ETHAN_BU"
+then
+    echo $LOCAL_ETHAN_BU_DIR/$LATEST_ETHAN_BU already exists.
+else
+    mkdir -p "$LOCAL_ETHAN_BU_DIR"
+    scp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/ethan/cmprd/$LATEST_ETHAN_BU_DAY/$LATEST_ETHAN_BU $LOCAL_ETHAN_BU_DIR
 fi
 
 echo

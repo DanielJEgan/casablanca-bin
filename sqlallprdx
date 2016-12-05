@@ -1,0 +1,10 @@
+#!/bin/bash
+source sqlremotelib.sh
+
+runOnServerX sam "$1"
+runOnServerX fergus "$1"
+runOnServerX ethan "$1"
+runOnServerX karen "$1"
+runOnServerX vlad "$1"
+
+echo
