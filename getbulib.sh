@@ -45,11 +45,9 @@ function restoreLatestLocalBackupForServer {
         mainDb=cmsbdev
         if [ "$1" = "eric" ]
         then
-            mainDb=cmdev
-            backedUpDb=cmprd
-        else
-            mainDb=cmsbdev
             backedUpDb=cmtst
+        else
+            backedUpDb=cmprd
         fi  
     fi  
 
@@ -71,30 +69,30 @@ function restoreLatestLocalBackupForServer {
         exit 1
     fi
 
-    CMPRD_BACKUP_DIRECTORY=$SERVER_BACKUP_DIRECTORY/cmprd
+    CMPRD_BACKUP_DIRECTORY=$SERVER_BACKUP_DIRECTORY/$backedUpDb
     if ! test -e "$CMPRD_BACKUP_DIRECTORY"
     then
         echo
-        echo 'ERROR: cmprd backup directory "'$CMPRD_BACKUP_DIRECTORY'" does not exist'
+        echo 'ERROR: $backedUpDb backup directory "'$CMPRD_BACKUP_DIRECTORY'" does not exist'
         echo
         exit 1
     fi
 
-    LATEST_BU_DAY=`ls /Users/djegan/backups/cm/$SERVER_NAME/cmprd|tail -1`
+    LATEST_BU_DAY=`ls /Users/djegan/backups/cm/$SERVER_NAME/$backedUpDb|tail -1`
     if [ "$LATEST_BU_DAY" = "" ]
     then
         echo
-        echo "ERROR: no backups found for $SERVER_NAME cmprd"
+        echo "ERROR: no backups found for $SERVER_NAME $backedUpDb"
         echo
         exit 1
     fi
 
-    LOCAL_BU_DIR="/Users/djegan/backups/cm/$SERVER_NAME/cmprd/$LATEST_BU_DAY"
+    LOCAL_BU_DIR="/Users/djegan/backups/cm/$SERVER_NAME/$backedUpDb/$LATEST_BU_DAY"
     LATEST_BU=`ls $LOCAL_BU_DIR|grep '\.backup$'|tail -1`
     if [ "$LATEST_BU" = "" ]
     then
         echo
-        echo "ERROR: no backups found for $SERVER_NAME cmprd"
+        echo "ERROR: no backups found for $SERVER_NAME $backedUpDb"
         echo
         exit 1
     fi

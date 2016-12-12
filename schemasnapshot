@@ -1,0 +1,43 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo "   Usage: schemasnapshot <snapshot-from machine>"
+    echo "          e.g. schemasnapshot sam"
+    echo
+    exit 1
+fi
+
+TIMESTAMP=`date +%Y%m%d-%H%M`
+
+if [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
+then
+    DBNAME=cmprd
+    SNAPSHOT_FILENAME=$1-$DBNAME-$TIMESTAMP.schemasnapshot
+    SERVER=$1.onebox.net.au
+    ssh onebox@$SERVER "pg_dump -h localhost -U postgres -Oxs $DBNAME" > $SNAPSHOT_FILENAME
+elif [ "$1" = "sam" ]
+then
+    DBNAME=cmprd
+    SNAPSHOT_FILENAME=$1-$DBNAME-$TIMESTAMP.schemasnapshot
+    SERVER=$1.apxium.com
+    ssh onebox@$SERVER "pg_dump -h localhost -U postgres -Oxs $DBNAME" > $SNAPSHOT_FILENAME
+elif [ "$1" = "eric" ]
+then
+    DBNAME=cmtst
+    SNAPSHOT_FILENAME=$1-$DBNAME-$TIMESTAMP.schemasnapshot
+    SERVER=$1.apxium.com
+    ssh onebox@$SERVER "pg_dump -h localhost -U postgres -Oxs $DBNAME" > $SNAPSHOT_FILENAME
+elif [ "$1" = "casablanca" ]
+then
+    DBNAME=cmsbdev
+    SNAPSHOT_FILENAME=$1-$DBNAME-$TIMESTAMP.schemasnapshot
+    SERVER=$1.onebox.net.au
+    pg_dump -h localhost -U postgres -Oxs $DBNAME > $SNAPSHOT_FILENAME
+else
+    echo
+    echo 'Unknown server "'$1'"'
+    echo
+    exit 1
+fi
