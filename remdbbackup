@@ -3,7 +3,7 @@ set -u
 set -e
 source remlib.sh
 
-USAGE="dbbackup <databaseName>"
+USAGE="remdbbackup <databaseName>"
 
 if [ $# -ne 1 ]
 then
@@ -13,8 +13,4 @@ then
     exit 1
 fi
 
-DBNAME=`getDbNameForServer $1`
-SERVER=`getFullyQualifiedNameForServer $1`
-BACKUP_FILEPATH=`getBackupFilepathForServer $1 $DBNAME`
-
-backupRemoteDatabase $SERVER $DBNAME $BACKUP_FILEPATH
+remoteDbBackup $1

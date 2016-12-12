@@ -2,7 +2,9 @@
 set -u
 set -e
 source commonlib.sh
-source getbulib.sh
+source remlib.sh
+#source getbulib.sh
+source bulib.sh
 
 if [ $# -ne 1 ]
 then
@@ -31,7 +33,10 @@ echo "    This will completely blow away all data in the main database and the i
 echo "    database as well as deleting everything in the emailArchive and fileStore."
 confimBeforeProceeding "    Are you sure you want to do this (y/n) ?"
 
-restoreLatestLocalBackupForServer $1
+echo
+echo ===== Backing up main database on $1 to local filesystem and restoring to local database $mainDb
+BACKUP_FILEPATH=`remoteDbBackup $1`
+restoreBackup cmsbdev $BACKUP_FILEPATH
 
 echo
 echo -n ===== Running obd upgradedb

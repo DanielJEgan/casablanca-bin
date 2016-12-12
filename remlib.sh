@@ -110,3 +110,23 @@ function backupRemoteDatabase {
     ssh onebox@$1 "pg_dump  -h localhost -U postgres -vFc $2" 2> $3.log > $3
 
 }
+
+function remoteDbBackup {
+
+    if [ "$1" = "" ]
+    then
+        >&2 echo
+        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+        >&2 echo
+        exit 1
+    fi
+
+    DBNAME=`getDbNameForServer $1`
+    SERVER=`getFullyQualifiedNameForServer $1`
+    BACKUP_FILEPATH=`getBackupFilepathForServer $1 $DBNAME`
+
+    backupRemoteDatabase $SERVER $DBNAME $BACKUP_FILEPATH
+
+    echo $BACKUP_FILEPATH
+
+}
