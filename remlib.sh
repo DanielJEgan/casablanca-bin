@@ -1,12 +1,20 @@
 function getDbNameForServer {
 
-    if [ "$1" = "" ]
+    if [ "$#" != "1" ]
     then
         >&2 echo
-        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+        >&2 echo "function getDbNameForServer: expected one parameter (server)"
         >&2 echo
         exit 1
     fi
+
+#    if [ "$1" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+#        >&2 echo
+#        exit 1
+#    fi
 
     if [ "$1" = "sam" ] || [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
     then
@@ -14,6 +22,12 @@ function getDbNameForServer {
     elif [ "$1" = "eric" ]
     then
         echo 'cmtst'
+    elif [ "$1" = "claudia" ]
+    then
+        echo 'obpaystage'
+    elif [ "$1" = "sabine" ]
+    then
+        echo 'obpay'
     else
         >&2 echo
         >&2 echo 'Unknown server "'$1'"'
@@ -25,13 +39,21 @@ function getDbNameForServer {
 
 function getFullyQualifiedNameForServer {
 
-    if [ "$1" = "" ]
+    if [ "$#" != "1" ]
     then
         >&2 echo
-        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+        >&2 echo "function getFullyQualifiedNameForServer: expected one parameter (server)"
         >&2 echo
         exit 1
     fi
+
+#    if [ "$1" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+#        >&2 echo
+#        exit 1
+#    fi
 
     if [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
     then
@@ -44,21 +66,29 @@ function getFullyQualifiedNameForServer {
 
 function getBackupFilepathForServer {
 
-    if [ "$1" = "" ]
+    if [ "$#" != "2" ]
     then
         >&2 echo
-        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+        >&2 echo "function getBackupFilepathForServer: expected two parameters (server and database)"
         >&2 echo
         exit 1
     fi
 
-    if [ "$2" = "" ]
-    then
-        >&2 echo
-        >&2 echo "ERROR: database name must be provided (unqualified name, e.g. cmprd)"
-        >&2 echo
-        exit 1
-    fi
+#    if [ "$1" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+#        >&2 echo
+#        exit 1
+#    fi
+#
+#    if [ "$2" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: database name must be provided (unqualified name, e.g. cmprd)"
+#        >&2 echo
+#        exit 1
+#    fi
 
     # Set and check MAIN_BACKUP_DIR
     MAIN_BACKUP_DIR=$HOME/backups/cm
@@ -83,29 +113,37 @@ function getBackupFilepathForServer {
 
 function backupRemoteDatabase {
 
-    if [ "$1" = "" ]
+    if [ "$#" != "3" ]
     then
         >&2 echo
-        >&2 echo "ERROR: fully qualified server name must be provided (e.g. sam.apxium.com)"
+        >&2 echo "function backupRemoteDatabase: expected three parameters (fully qualified server name, database, and backup filepath)"
         >&2 echo
         exit 1
     fi
 
-    if [ "$2" = "" ]
-    then
-        >&2 echo
-        >&2 echo "ERROR: database name must be provided (e.g. cmprd)"
-        >&2 echo
-        exit 1
-    fi
-
-    if [ "$3" = "" ]
-    then
-        >&2 echo
-        >&2 echo "ERROR: backup filepath must be provided"
-        >&2 echo
-        exit 1
-    fi
+#    if [ "$1" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: fully qualified server name must be provided (e.g. sam.apxium.com)"
+#        >&2 echo
+#        exit 1
+#    fi
+#
+#    if [ "$2" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: database name must be provided (e.g. cmprd)"
+#        >&2 echo
+#        exit 1
+#    fi
+#
+#    if [ "$3" = "" ]
+#    then
+#        >&2 echo
+#        >&2 echo "ERROR: backup filepath must be provided"
+#        >&2 echo
+#        exit 1
+#    fi
 
     ssh onebox@$1 "pg_dump  -h localhost -U postgres -vFc $2" 2> $3.log > $3
 
@@ -113,10 +151,10 @@ function backupRemoteDatabase {
 
 function remoteDbBackup {
 
-    if [ "$1" = "" ]
+    if [ "$#" != "1" ]
     then
         >&2 echo
-        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
+        >&2 echo "function remoteDbBackup: expected one parameter (the server)"
         >&2 echo
         exit 1
     fi
