@@ -15,7 +15,13 @@ then
     exit 1
 fi
 
-if [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
+if [ "$1" = "claudia" ]
+then
+    refreshObpay "$1" obpaystage
+elif [ "$1" = "sabine" ]
+then
+    refreshObpay "$1" obpay
+elif [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
 then
     obd="java -jar "`ls ~/dev/cm/cmAlternate/cm-core/target/cm-core*-SNAPSHOT-CmCommandLine.jar|head -1`""
     refreshMainSystemEtc "$obd" "$1" cmdev cmimportdev

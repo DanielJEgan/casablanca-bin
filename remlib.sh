@@ -149,6 +149,20 @@ function backupRemoteDatabase {
 
 }
 
+function backupRemoteObpayDatabase {
+
+    if [ "$#" != "3" ]
+    then
+        >&2 echo
+        >&2 echo "function backupRemoteDatabase: expected three parameters (fully qualified server name, database, and backup filepath)"
+        >&2 echo
+        exit 1
+    fi
+
+    ssh djegan@$1 "sudo -iu postgres pg_dump -vFc $2" 2> $3.log > $3
+
+}
+
 function remoteDbBackup {
 
     if [ "$#" != "1" ]
@@ -164,6 +178,27 @@ function remoteDbBackup {
     BACKUP_FILEPATH=`getBackupFilepathForServer $1 $DBNAME`
 
     backupRemoteDatabase $SERVER $DBNAME $BACKUP_FILEPATH
+
+    echo $BACKUP_FILEPATH
+
+}
+
+
+function remoteObpayDbBackup {
+
+    if [ "$#" != "1" ]
+    then
+        >&2 echo
+        >&2 echo "function remoteDbBackup: expected one parameter (the server)"
+        >&2 echo
+        exit 1
+    fi
+
+    DBNAME=`getDbNameForServer $1`
+    SERVER=`getFullyQualifiedNameForServer $1`
+    BACKUP_FILEPATH=`getBackupFilepathForServer $1 $DBNAME`
+
+    backupRemoteObpayDatabase $SERVER $DBNAME $BACKUP_FILEPATH
 
     echo $BACKUP_FILEPATH
 

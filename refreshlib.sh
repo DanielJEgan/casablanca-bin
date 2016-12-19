@@ -3,7 +3,7 @@ function  refreshMainSystemEtc {
 
     if [ "$#" != "4" ]
     then
-        >&2 echo $#
+        >&2 echo
         >&2 echo "function refreshMainSystemEtc: expected four parameters (ob command, server, main db, and import db)"
         >&2 echo
         exit 1
@@ -44,6 +44,33 @@ function  refreshMainSystemEtc {
     echo - flushed fileStore
     rm -rf ~/emailArchive/*
     echo - flushed emailArchive
+
+    echo
+
+}
+
+function  refreshObpay {
+
+    if [ "$#" != "2" ]
+    then
+        >&2 echo
+        >&2 echo "function refreshObpay: expected two parameters (server and local db)"
+        >&2 echo
+        exit 1
+    fi
+
+    SERVER=$1
+    localDb=$2
+
+
+    echo
+    echo "    This will completely blow away all data in the $localDb database."
+    confimBeforeProceeding "    Are you sure you want to do this (y/n) ?"
+
+    echo
+    echo ===== Backing up obpay database on $SERVER to local filesystem and restoring to local database $localDb
+    BACKUP_FILEPATH=`remoteObpayDbBackup $SERVER`
+    restoreObpayBackup $localDb $BACKUP_FILEPATH
 
     echo
 
