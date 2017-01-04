@@ -6,10 +6,17 @@ source remlib.sh
 source refreshlib.sh
 source bulib.sh
 
+NO_UPGRADE='false'
+if [ $1 = "--no-upgrade" ]
+then
+    NO_UPGRADE='true'
+    shift
+fi
+
 if [ $# -ne 1 ]
 then
     echo
-    echo "   Usage: refresh <backup-from machine>"
+    echo "   Usage: refresh [--no-upgrade] <backup-from machine>"
     echo "          e.g. refresh sam"
     echo
     exit 1
@@ -24,8 +31,8 @@ then
 elif [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
 then
     obd="java -jar "`ls ~/dev/cm/cmAlternate/cm-core/target/cm-core*-SNAPSHOT-CmCommandLine.jar|head -1`""
-    refreshMainSystemEtc "$obd" "$1" cmdev cmimportdev
+    refreshMainSystemEtc "$obd" "$1" cmdev cmimportdev $NO_UPGRADE
 else
     obd="java -jar "`ls ~/dev/cm/cm/cm-core/target/cm-core*-SNAPSHOT-CmCommandLine.jar|head -1`" -c /Users/djegan/etcSBConfig"
-    refreshMainSystemEtc "$obd" "$1" cmsbdev cmimportsbdev
+    refreshMainSystemEtc "$obd" "$1" cmsbdev cmimportsbdev $NO_UPGRADE
 fi

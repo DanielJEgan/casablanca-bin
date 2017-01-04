@@ -1,10 +1,10 @@
 
 function  refreshMainSystemEtc {
 
-    if [ "$#" != "4" ]
+    if [ "$#" != "5" ]
     then
         >&2 echo
-        >&2 echo "function refreshMainSystemEtc: expected four parameters (ob command, server, main db, and import db)"
+        >&2 echo "function refreshMainSystemEtc: expected four parameters (ob command, server, main db, import db, and NO_UPGRADE)"
         >&2 echo
         exit 1
     fi
@@ -13,6 +13,7 @@ function  refreshMainSystemEtc {
     SERVER=$2
     mainDb=$3
     importDb=$4
+    NO_UPGRADE=$5
 
 
     echo
@@ -25,9 +26,12 @@ function  refreshMainSystemEtc {
     BACKUP_FILEPATH=`remoteDbBackup $SERVER`
     restoreBackup $mainDb $BACKUP_FILEPATH
 
-    echo
-    echo -n ===== Running obd upgradedb
-    $obd upgradedb
+    if [ "$NO_UPGRADE" != "true" ]
+    then
+        echo
+        echo ===== Running obd upgradedb
+        $obd upgradedb
+    fi
 
     echo
     echo ===== Recreating $importDb
