@@ -23,4 +23,4 @@ then
 fi
 
 
-pg_restore -w -h localhost -U $DATABASE -n public --no-owner -d $DATABASE "$BACKUP_FILE"
+pg_restore -w -h localhost -U $DATABASE -n public --no-owner --no-acl -d $DATABASE "$BACKUP_FILE"

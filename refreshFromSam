@@ -1,0 +1,78 @@
+#!/bin/bash
+set -u
+set -e
+source commonlib.sh
+source remlib.sh
+#source refreshlib.sh
+source bulib.sh
+
+NO_UPGRADE='false'
+if [ $# -ne 0 ] && [ $1 = "--no-upgrade" ]
+then
+    NO_UPGRADE='true'
+    shift
+fi
+
+if [ $# -ne 0 ]
+then
+    echo
+    echo "   Usage: refresh [--no-upgrade]"
+    echo "          e.g. refresh --no-upgrade"
+    echo
+    exit 1
+fi
+
+function  refreshMainSystemEtc {
+
+    if [ "$#" != "4" ]
+    then
+        >&2 echo
+        >&2 echo "function refreshMainSystemEtc: expected four parameters (server, main db, import db, and NO_UPGRADE)"
+        >&2 echo
+        exit 1
+    fi
+
+    SERVER=$1
+    mainDb=$2
+    importDb=$3
+    NO_UPGRADE=$4
+
+
+    echo
+    echo "    This will completely blow away all data in the main database and the import"
+    echo "    database as well as deleting everything in the emailArchive and fileStore."
+    confimBeforeProceeding "    Are you sure you want to do this (y/n) ?"
+
+    echo
+    echo ===== Backing up main database on $SERVER to local filesystem and restoring to local database $mainDb
+    BACKUP_FILEPATH=`remoteDbBackup $SERVER`
+    restoreBackup $mainDb $BACKUP_FILEPATH
+
+    if [ "$NO_UPGRADE" != "true" ]
+    then
+        echo
+        echo ===== Running ob upgradedb
+        ob upgradedb
+    fi
+
+    echo
+    echo ===== Recreating $importDb
+    psql -h localhost postgres postgres -c "drop database $importDb"
+    psql -h localhost postgres postgres -c "create database $importDb"
+
+    echo
+    echo -n ===== Running ob createimportdb
+    ob createimportdb
+
+    echo
+    echo ===== Flushing fileStore and emailArchive
+    rm -rf ~/fileStore/*
+    echo - flushed fileStore
+    rm -rf ~/emailArchive/*
+    echo - flushed emailArchive
+
+    echo
+
+}
+
+refreshMainSystemEtc sam cmtst cmimporttst $NO_UPGRADE

@@ -28,11 +28,47 @@ then
 elif [ "$1" = "sabine" ]
 then
     refreshObpay "$1" obpay
-elif [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
+elif [ "$1" = "eric" ]
 then
-    obd="java -jar "`ls ~/dev/cm/cmAlternate/cm-core/target/cm-core*-SNAPSHOT-CmCommandLine.jar|head -1`""
-    refreshMainSystemEtc "$obd" "$1" cmdev cmimportdev $NO_UPGRADE
+    #obd="java -jar /Users/djegan/bin/Cm3CommandLine.jar -c /Users/djegan/.apxium3"
+    obd="java -jar "`ls ~/dev/cm/cm3/cm-core/target/cm-core*-CmCommandLine.jar|head -1`" -c /Users/djegan/.apxium3"
+    refreshMainSystemEtc "$obd" "$1" apxium3dev apxium3importdev $NO_UPGRADE
+elif [ "$1" = "fergus" ] || [ "$1" = "vlad" ]
+then
+    #obd="java -jar /Users/djegan/bin/CmAlternateCommandLine.jar"
+    obd="java -jar "`ls ~/dev/cm/cm2/cm-core/target/cm-core*-CmCommandLine.jar|head -1`
+    refreshMainSystemEtc "$obd" "$1" apxium2dev apxium2importdev $NO_UPGRADE
+elif [ "$1" = "rawsons" ]
+then
+    obd="java -jar "`ls ~/dev/cm/cm/cm-core/target/cm-core*-CmCommandLine.jar|head -1`" -c /Users/djegan/.apxium"
+#    refreshMainSystemEtc "$obd" "sam" apxiumdev apxiumimportdev $NO_UPGRADE /Users/djegan/backups/cm/sam/sam-cmprd-20170227-1615.backup /Users/djegan/backups/cm/rawsons/associatedWith_sam-cmprd-20170227-1615/apxiumimportdevNoLineItems.backup
+    refreshMainSystemEtc "$obd" "sam" apxiumdev apxiumimportdev $NO_UPGRADE /Users/djegan/backups/cm/sam/sam-cmprd-20170204-2221.backup /Users/djegan/backups/cm/rawsons/associatedWith_sam-cmprd-20170227-1615/apxiumimportdevWITHLineItems.backup
+#    refreshMainSystemEtc "$obd" "sam" apxiumdev apxiumimportdev $NO_UPGRADE /Users/djegan/backups/cm/sam/sam-cmprd-20170204-2221.backup
+
+    echo "===== Setting AP interface enabled time to 24H for Rawsons"
+    psql -h localhost apxiumdev apxiumdev -c "update merchants set ap_interface_enabled_time_periods_json = '[ {\"from\": \"00:00\", \"to\": \"23:59\" } ]' where abn_number = 42605705815"
+    echo
+
+    echo "===== Setting upload_invoice_line_items = true for Rawsons"
+    psql -h localhost apxiumdev apxiumdev -c "update merchants set upload_invoice_line_items = true, one_line_item_invoices = false where abn_number = 42605705815"
+    echo
+
+    echo "===== Updating default communications rules for Rawsons"
+    psql -h localhost apxiumdev apxiumdev -c "update debtor_communication_rulesets set\
+                                                 send_invoice_email = true,\
+                                                 send_invoice_email_sms = true,\
+                                                 send_notice_of_invoice_email = false,\
+                                                 send_notice_of_invoice_email_sms = false,\
+                                                 invoice_communication_delay = 0\
+                                              where id = (select default_debtor_communication_ruleset_id from merchants where abn_number = 42605705815)"
+    echo
+
+    echo "===== Setting current date to 2017-03-03"
+    $obd set-date 2017-03-03
+    echo
+
 else
-    obd="java -jar "`ls ~/dev/cm/cm/cm-core/target/cm-core*-SNAPSHOT-CmCommandLine.jar|head -1`" -c /Users/djegan/etcSBConfig"
-    refreshMainSystemEtc "$obd" "$1" cmsbdev cmimportsbdev $NO_UPGRADE
+    #obd="java -jar /Users/djegan/bin/CmCommandLine.jar -c /Users/djegan/etcSBConfig"
+    obd="java -jar "`ls ~/dev/cm/cm/cm-core/target/cm-core*-CmCommandLine.jar|head -1`" -c /Users/djegan/.apxium"
+    refreshMainSystemEtc "$obd" "$1" apxiumdev apxiumimportdev $NO_UPGRADE
 fi

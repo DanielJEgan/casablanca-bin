@@ -8,23 +8,7 @@ function restoreBackup {
         >&2 echo
         exit 1
     fi
-
-#    if [ "$1" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: local dbname must be provided"
-#        >&2 echo
-#        exit 1
-#    fi
     LOCAL_DBNAME=$1
-
-#    if [ "$2" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: backup filepath must be provided"
-#        >&2 echo
-#        exit 1
-#    fi
     BACKUP_FILEPATH=$2
 
     echo "Restoring $BACKUP_FILEPATH to $LOCAL_DBNAME"
@@ -40,7 +24,7 @@ function restoreBackup {
 
 }
 
-function restoreObpayBackup {
+function restoreNonApxiumBackup {
 
     if [ "$#" != "2" ]
     then

@@ -5,12 +5,8 @@ echo jack
 ssh djegan@jack.collectionsmanager.com.au 'df -h'|grep '^/dev'
 
 echo
-echo ethan
-ssh onebox@ethan.onebox.net.au 'df -h'|grep '^/dev'
-
-echo
-echo karen
-ssh onebox@karen.onebox.net.au 'df -h'|grep '^/dev'
+echo sam
+ssh onebox@sam.apxium.com 'df -h'|grep '^/dev'
 
 echo
 echo fergus

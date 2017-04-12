@@ -8,14 +8,6 @@ function getDbNameForServer {
         exit 1
     fi
 
-#    if [ "$1" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
-#        >&2 echo
-#        exit 1
-#    fi
-
     if [ "$1" = "sam" ] || [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
     then
         echo 'cmprd'
@@ -47,14 +39,6 @@ function getFullyQualifiedNameForServer {
         exit 1
     fi
 
-#    if [ "$1" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
-#        >&2 echo
-#        exit 1
-#    fi
-
     if [ "$1" = "fergus" ] || [ "$1" = "ethan" ] || [ "$1" = "karen" ] || [ "$1" = "vlad" ] || [ "$1" = "cal" ]
     then
         echo "$1.onebox.net.au"
@@ -73,22 +57,6 @@ function getBackupFilepathForServer {
         >&2 echo
         exit 1
     fi
-
-#    if [ "$1" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: server name must be provided (unqualified name, e.g. fergus)"
-#        >&2 echo
-#        exit 1
-#    fi
-#
-#    if [ "$2" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: database name must be provided (unqualified name, e.g. cmprd)"
-#        >&2 echo
-#        exit 1
-#    fi
 
     # Set and check MAIN_BACKUP_DIR
     MAIN_BACKUP_DIR=$HOME/backups/cm
@@ -120,30 +88,6 @@ function backupRemoteDatabase {
         >&2 echo
         exit 1
     fi
-
-#    if [ "$1" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: fully qualified server name must be provided (e.g. sam.apxium.com)"
-#        >&2 echo
-#        exit 1
-#    fi
-#
-#    if [ "$2" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: database name must be provided (e.g. cmprd)"
-#        >&2 echo
-#        exit 1
-#    fi
-#
-#    if [ "$3" = "" ]
-#    then
-#        >&2 echo
-#        >&2 echo "ERROR: backup filepath must be provided"
-#        >&2 echo
-#        exit 1
-#    fi
 
     ssh onebox@$1 "pg_dump  -h localhost -U postgres -vFc $2" 2> $3.log > $3
 
