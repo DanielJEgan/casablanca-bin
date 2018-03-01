@@ -1,0 +1,1 @@
+ssh onebox@sam.apxium.com "bin/ob $*"

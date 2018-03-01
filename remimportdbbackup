@@ -1,0 +1,16 @@
+#!/bin/sh
+set -u
+set -e
+source /Users/djegan/.obbin/remlib.sh
+
+USAGE="remdbbackup <databaseName>"
+
+if [ $# -ne 1 ]
+then
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+remoteImportDbBackup $1

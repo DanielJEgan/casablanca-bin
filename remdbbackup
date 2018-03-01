@@ -1,7 +1,7 @@
 #!/bin/sh
 set -u
 set -e
-source remlib.sh
+source ../.obbin/remlib.sh
 
 USAGE="remdbbackup <databaseName>"
 

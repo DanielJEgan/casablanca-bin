@@ -1,0 +1,12 @@
+#!/bin/bash
+set -Eeuo pipefail
+
+for f in $*
+do
+    echo
+    #set -x
+    git tag archive/$f $f
+    git push origin archive/$f
+    git branch -D $f
+    git push origin :$f
+done

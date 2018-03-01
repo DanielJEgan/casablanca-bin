@@ -2,7 +2,7 @@
 set -u
 set -e
 source commonlib.sh
-source remlib.sh
+source ../.obbin/remlib.sh
 #source refreshlib.sh
 source bulib.sh
 

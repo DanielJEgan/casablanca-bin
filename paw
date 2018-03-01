@@ -1,0 +1,1 @@
+ssh onebox@sam.apxium.com "java -jar ~/bin/xerodump-1.0.0-SNAPSHOT-CommandLine.jar" $*

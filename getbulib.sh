@@ -9,9 +9,16 @@ function getLatestBackupForServer {
     fi
     SERVER_NAME=$1
 
-    LATEST_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/$SERVER_NAME/cmprd"|tail -1`
-    LATEST_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/$SERVER_NAME/cmprd/$LATEST_BU_DAY"|grep '\.backup$'|tail -1`
-    LOCAL_BU_DIR="/Users/djegan/backups/cm/$SERVER_NAME/cmprd/$LATEST_BU_DAY"
+    if [ "$1" = "eric" ]
+    then
+        database="cmtst"
+    else
+        database="cmprd"
+    fi
+
+    LATEST_BU_DAY=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/$SERVER_NAME/$database"|tail -1`
+    LATEST_BU=`ssh djegan@jack.collectionsmanager.com.au "ls /var/lib/postgresql/backups/$SERVER_NAME/$database/$LATEST_BU_DAY"|grep '\.backup$'|tail -1`
+    LOCAL_BU_DIR="/Users/djegan/backups/cm/$SERVER_NAME/database/$LATEST_BU_DAY"
 
 
     echo
@@ -21,7 +28,7 @@ function getLatestBackupForServer {
         echo $LOCAL_BU_DIR/$LATEST_BU already exists.
     else
         mkdir -p "$LOCAL_BU_DIR"
-        scp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/$SERVER_NAME/cmprd/$LATEST_BU_DAY/$LATEST_BU $LOCAL_BU_DIR
+        scp djegan@jack.collectionsmanager.com.au:/var/lib/postgresql/backups/$SERVER_NAME/$database/$LATEST_BU_DAY/$LATEST_BU $LOCAL_BU_DIR
     fi
 
 }
