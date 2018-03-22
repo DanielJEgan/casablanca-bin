@@ -1,0 +1,23 @@
+#!/bin/bash
+set -euo pipefail
+
+USAGE="recentbr"
+
+
+if [ $# -ne 0 ]
+then
+    echo
+    echo "   Usage: $USAGE"
+    echo
+    exit 1
+fi
+
+echo
+
+for BRANCH in `git branch --list|sed -e 's/^*//'`
+do
+    LOGLINE=`git log -n 1 --pretty=format:"%ci" $BRANCH`
+    echo "$LOGLINE"   $BRANCH
+done | sort
+
+echo

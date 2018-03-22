@@ -53,5 +53,5 @@ scp  -i ~/.ssh/ApxiumSandbox.pem $TMP_WORKINGDIR/cm-server/target/cm-server-"$AX
 ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "ln -sf ~/releases/cm-server-"$AX_VERSION".jar ~/bin/cm-server.jar"
 ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "ln -sf ~/releases/cm-core-"$AX_VERSION"-CmCommandLine.jar ~/bin/CmCommandLine.jar"
 ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "stopob"
-ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "ob upgradedb"
+ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "/home/admin/bin/ob upgradedb"
 ssh -i ~/.ssh/ApxiumSandbox.pem admin@"$DEST_MACHINE".apxium.com "startob"
